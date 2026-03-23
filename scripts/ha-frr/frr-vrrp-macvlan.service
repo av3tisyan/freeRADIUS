@@ -1,0 +1,12 @@
+[Unit]
+Description=Create macvlan for FRR VRRP (RADIUS VIP 192.168.200.100)
+Before=frr.service
+
+[Service]
+Type=oneshot
+Environment=RADIUS_VRRP_INTERFACE=ens18
+ExecStart=/usr/local/bin/frr-vrrp-macvlan.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

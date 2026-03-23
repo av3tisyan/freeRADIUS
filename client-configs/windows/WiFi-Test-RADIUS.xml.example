@@ -1,0 +1,30 @@
+<WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
+  <name>YOUR_WIFI_SSID</name>
+  <SSIDConfig><SSID><name>YOUR_WIFI_SSID</name></SSID></SSIDConfig>
+  <connectionType>ESS</connectionType>
+  <connectionMode>auto</connectionMode>
+  <MSM>
+    <security>
+      <authEncryption>
+        <authentication>WPA2</authentication>
+        <encryption>AES</encryption>
+        <useOneX>true</useOneX>
+      </authEncryption>
+      <OneX xmlns="http://www.microsoft.com/networking/OneX/v1">
+        <authMode>user</authMode>
+        <EAPConfig>
+          <EapHostConfig xmlns="http://www.microsoft.com/provisioning/EapHostConfig">
+            <EapMethod><Type xmlns="http://www.microsoft.com/provisioning/EapCommon">21</Type></EapMethod>
+            <Config xmlns="http://www.microsoft.com/provisioning/EapHostConfig">
+              <EapTtls xmlns="http://www.microsoft.com/provisioning/EapTtlsConnectionPropertiesV1">
+                <ServerValidation><DisableUserPromptForServerValidation>false</DisableUserPromptForServerValidation></ServerValidation>
+                <LocalCredentials><HideIdentity>true</HideIdentity><AnonymousName>anonymous</AnonymousName></LocalCredentials>
+                <Phase2Authentication><PapAuthentication/></Phase2Authentication>
+              </EapTtls>
+            </Config>
+          </EapHostConfig>
+        </EAPConfig>
+      </OneX>
+    </security>
+  </MSM>
+</WLANProfile>

@@ -1,0 +1,144 @@
+# -*- text -*-
+######################################################################
+#  Default virtual server: auth, acct, OU-based allow/deny.
+######################################################################
+
+server default {
+
+listen {
+	type = auth
+	ipaddr = *
+	port = 1812
+	limit {
+		max_connections = 16
+		lifetime = 0
+		idle_timeout = 30
+	}
+}
+
+listen {
+	ipaddr = *
+	port = 1813
+	type = acct
+}
+
+authorize {
+	filter_username
+	preprocess
+	chap
+	mschap
+	digest
+	suffix
+
+	eap {
+		ok = return
+	}
+
+	files
+
+	# 1. Look up the user in LDAP/Active Directory
+	ldap
+
+	# 2. Apply your logic based on the user's location (DN)
+	if (ok) {
+		# BLOCK: Any user inside the service-accounts OU (example name — adjust to your AD)
+		if (&control:Ldap-UserDn =~ /OU=Service-Accounts/) {
+			update reply {
+				Reply-Message := "Access Denied: Service accounts cannot use WiFi/VPN."
+			}
+			reject
+		}
+
+		# ALLOW: Anyone in the Users/Corporate OU (example — adjust DN to your AD)
+		elsif (&control:Ldap-UserDn =~ /OU=Users,OU=Corporate,DC=example,DC=com/) {
+			update control {
+				Auth-Type := LDAP
+			}
+		}
+
+		# REJECT: Anyone else found in AD but not in the approved OU
+		else {
+			update reply {
+				Reply-Message := "Access Denied: Unauthorized Department."
+			}
+			reject
+		}
+	}
+
+	expiration
+	logintime
+	pap
+}
+
+authenticate {
+	Auth-Type PAP {
+		pap
+	}
+	Auth-Type CHAP {
+		chap
+	}
+	Auth-Type MS-CHAP {
+		mschap
+	}
+	mschap
+	digest
+	Auth-Type LDAP {
+		ldap
+	}
+	eap
+}
+
+preacct {
+	preprocess
+	acct_unique
+	suffix
+	files
+}
+
+accounting {
+	detail
+	unix
+	-sql
+	exec
+	attr_filter.accounting_response
+}
+
+session {
+}
+
+post-auth {
+	if (session-state:User-Name && reply:User-Name && request:User-Name && (reply:User-Name == request:User-Name) && !&request:EAP-Message) {
+		update reply {
+			&User-Name !* ANY
+		}
+	}
+	update {
+		&reply: += &session-state:
+	}
+
+	# Wi-Fi: long session so AP doesn't re-prompt for credentials often (see docs/WIFI_8021X_TROUBLESHOOTING.md).
+	if (&request:Client-Shortname =~ /wifi-nas/) {
+		update reply {
+			&Session-Timeout := 86400
+		}
+	}
+
+	exec
+	remove_reply_message_if_eap
+
+	Post-Auth-Type REJECT {
+		-sql
+		attr_filter.access_reject
+		eap
+		remove_reply_message_if_eap
+	}
+}
+
+pre-proxy {
+}
+
+post-proxy {
+	eap
+}
+
+}

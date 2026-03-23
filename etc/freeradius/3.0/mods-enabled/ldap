@@ -1,0 +1,42 @@
+# -*- text -*-
+##
+## ldap.conf -- Active Directory via LDAPS
+## user/group subsections; sAMAccountName → User-Name. Inner-tunnel uses for bind auth.
+## Replace REPLACE_* with your LDAP servers, bind DN, base DN, and bind password on the server.
+##
+ldap {
+	# Active Directory: bind-as-user auth. Set to 'no' or you get "Failed to retrieve eDirectory password".
+	edir = no
+
+	# One server: server = "ldaps://dc01.example.com"
+	# Two servers (preferred; comma-separated in one line is deprecated): add two lines:
+	#   server = "ldaps://dc01.example.com"
+	#   server = "ldaps://dc02.example.com"
+	server = "REPLACE_LDAP_SERVERS"
+	identity = "REPLACE_LDAP_BIND_DN"
+	# FreeRADIUS 3.2 does not expand ${env:VAR} here; set the literal password on the server.
+	password = "REPLACE_LDAP_BIND_PASSWORD_ON_SERVER"
+
+	base_dn = "REPLACE_LDAP_BASE_DN"
+
+	user {
+		base_dn = "${..base_dn}"
+		filter = "(sAMAccountName=%{%{Stripped-User-Name}:-%{User-Name}})"
+	}
+
+	# Group search: populates LDAP-Group for post-auth VLAN assignment. AD: group has "member", name is "cn".
+	# base_dn must include where VLAN groups live. Use DC=... to search domain; narrow OU only if all groups are under it.
+	group {
+		base_dn = "DC=example,DC=com"
+		filter = "(objectClass=group)"
+		membership_filter = "(member=%{control:Ldap-UserDn})"
+		membership_attribute = "member"
+		name_attribute = "cn"
+	}
+
+	tls {
+		# Path to your AD/enterprise root CA (PEM) used to verify LDAPS server certs.
+		ca_file = "/etc/freeradius/3.0/certs/REPLACE_AD_ROOT_CA_FILENAME"
+		require_cert = "demand"
+	}
+}

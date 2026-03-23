@@ -1,0 +1,11 @@
+[Unit]
+Description=Add BGP anycast address 192.168.200.100/32 on loopback for FreeRADIUS
+Before=frr.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/anycast-address-on-lo.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+# Example /etc/frr/daemons – enable BGP for anycast.
+# Copy relevant parts into your /etc/frr/daemons (do not replace the whole file).
+# Then: sudo systemctl restart frr
+
+bgpd=yes
+# ospfd=no
+# ... other daemons as needed ...
+
+vtysh_enable=yes

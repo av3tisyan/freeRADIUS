@@ -1,0 +1,39 @@
+# FreeRADIUS config repo – never commit secrets or generated certs/keys
+
+# Private keys and certificates (generated or copied on server)
+*.key
+*.pem
+*.crt
+*.p12
+*.der
+*.csr
+dh
+crl/
+*.crl
+
+# Makefile / bootstrap generated (contain passphrases or serials)
+passwords.mk
+index.txt
+index.txt.attr
+index.txt.old
+serial
+serial.old
+.Rand
+.rand
+
+# Editor and OS
+.DS_Store
+Thumbs.db
+*.swp
+*~
+*.bak
+*.old
+
+# Logs and runtime
+*.log
+radacct/
+
+# Local overrides (if you use them)
+*.local
+.env
+.env.*

@@ -1,0 +1,21 @@
+# Oneshot unit that runs the sync script as root. Used from freeradius.service
+# ExecStartPost so sync runs with root's SSH key and config access (systemd
+# sets "no new privileges" on the main service, so we cannot sudo from inside
+# the script).
+#
+# Install:
+#   sudo cp freeradius-sync-after-start.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+# The freeradius.service.d drop-in must have:
+#   ExecStartPost=/bin/systemctl start freeradius-sync-after-start.service
+
+[Unit]
+Description=FreeRADIUS sync config to Node 2 (after start)
+After=freeradius.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+User=root
+Environment=HOME=/root
+ExecStart=/usr/local/bin/sync-freeradius-to-node2.sh

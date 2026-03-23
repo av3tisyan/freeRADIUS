@@ -1,0 +1,15 @@
+! Node 1 (192.168.200.21) – VRRP master. Merge into /etc/frr/frr.conf.
+! Use the same interface name as your 192.168.200.x management address (e.g. ens18).
+frr version 9.x
+frr defaults traditional
+hostname freeradius-node-a
+service integrated-vtysh-config
+!
+interface ens18
+ vrrp 23 version 3
+ vrrp 23 priority 110
+ vrrp 23 advertisement-interval 1000
+ vrrp 23 ip 192.168.200.100
+!
+line vty
+!

@@ -1,0 +1,80 @@
+# -*- text -*-
+##
+## eap.conf -- EAP configuration for HA cluster (hardened)
+## Outer: EAP-TTLS (or PEAP) with anonymous identity.
+## Inner: PAP (LDAP bind). NTLM disabled in AD so MS-CHAPv2/ntlm_auth not used; password only inside TLS tunnel.
+## FreeRADIUS 3.2 syntax. Safe for rsync between Node 1 and Node 2.
+##
+#######################################################################
+#
+#  Do NOT set 'Auth-Type := EAP' in any site. The server sets it automatically.
+#
+eap {
+	default_eap_type = ttls
+
+	timer_expire = 60
+	ignore_unknown_eap_types = no
+	cisco_accounting_username_bug = no
+	max_sessions = ${max_requests}
+
+	############################################################
+	#  TLS configuration shared by TTLS/PEAP (tls-common)
+	#  - Strong ciphers only; TLS 1.2; ECDH for forward secrecy.
+	#  - fragment_size = 1000 for RADIUS-over-UDP and path MTU.
+	############################################################
+	tls-config tls-common {
+		# Set to your server.key passphrase, or leave empty if key is not encrypted.
+		private_key_password = REPLACE_TLS_KEY_PASSWORD_OR_EMPTY
+		private_key_file = ${certdir}/server.key
+		certificate_file = ${certdir}/server.pem
+		ca_file = ${cadir}/ca.pem
+		ca_path = ${cadir}
+
+		fragment_size = 1000
+		include_length = yes
+
+		# Prefer strong ciphers (no RC4, no 3DES); TLS 1.2 only.
+		cipher_list = "EECDH+AESGCM:EECDH+CHACHA20:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"
+		cipher_server_preference = yes
+		tls_min_version = "1.2"
+		tls_max_version = "1.2"
+		ecdh_curve = "X25519:prime256v1:secp384r1"
+
+		cache {
+			enable = no
+		}
+	}
+
+	md5 {
+	}
+
+	gtc {
+		auth_type = PAP
+	}
+
+	mschapv2 {
+	}
+
+	############################################################
+	#  EAP-TTLS: outer tunnel (anonymous), inner PAP → LDAP bind.
+	#  NTLM disabled in AD; inner PAP sends password inside TLS only.
+	############################################################
+	ttls {
+		tls = tls-common
+		default_eap_type = pap
+		copy_request_to_tunnel = no
+		use_tunneled_reply = yes
+		virtual_server = "inner-tunnel"
+	}
+
+	############################################################
+	#  PEAP: inner PAP → LDAP bind (NTLM disabled).
+	############################################################
+	peap {
+		tls = tls-common
+		default_eap_type = pap
+		copy_request_to_tunnel = no
+		use_tunneled_reply = yes
+		virtual_server = "inner-tunnel"
+	}
+}

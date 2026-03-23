@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>PayloadContent</key>
+	<array>
+		<dict>
+			<key>PayloadCertificateFileName</key>
+			<string>ca.pem</string>
+			<key>PayloadContent</key>
+			<data>UkVQTEFDRV9XSVRIX0JBU0U2NF9PRl9ZT1VUX0NBX1BFTR==</data>
+			<key>PayloadDisplayName</key>
+			<string>RADIUS Root CA</string>
+			<key>PayloadIdentifier</key>
+			<string>com.example.security.root.cert</string>
+			<key>PayloadType</key>
+			<string>com.apple.security.root</string>
+			<key>PayloadUUID</key>
+			<string>A1B2C3D4-E5F6-47A8-B9C0-D1E2F3A4B5C6</string>
+			<key>PayloadVersion</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AutoJoin</key>
+			<true/>
+			<key>EAPClientConfiguration</key>
+			<dict>
+				<key>AcceptEAPTypes</key><array><integer>21</integer></array>
+				<key>TTLSInnerAuthentication</key><string>PAP</string>
+				<key>OuterIdentity</key><string>anonymous</string>
+				<key>UserName</key><string>%username%</string>
+				<key>EAPClientAllowPasswords</key><true/>
+				<key>OneTimePassword</key><false/>
+				<key>PayloadCertificateAnchorUUID</key>
+				<array><string>A1B2C3D4-E5F6-47A8-B9C0-D1E2F3A4B5C6</string></array>
+			</dict>
+			<key>EncryptionType</key><string>Any</string>
+			<key>SSID_STR</key><string>YOUR_WIFI_SSID</string>
+			<key>PayloadIdentifier</key><string>com.example.wifi.managed.wifi1</string>
+			<key>PayloadType</key><string>com.apple.wifi.managed</string>
+			<key>PayloadUUID</key><string>B2C3D4E5-F6A7-48B9-C0D1-E2F3A4B5C6D7</string>
+			<key>PayloadVersion</key><integer>1</integer>
+		</dict>
+		<dict>
+			<key>EAPClientConfiguration</key>
+			<dict>
+				<key>AcceptEAPTypes</key><array><integer>21</integer></array>
+				<key>TTLSInnerAuthentication</key><string>PAP</string>
+				<key>OuterIdentity</key><string>anonymous</string>
+				<key>UserName</key><string>%username%</string>
+				<key>EAPClientAllowPasswords</key><true/>
+				<key>OneTimePassword</key><false/>
+				<key>PayloadCertificateAnchorUUID</key>
+				<array><string>A1B2C3D4-E5F6-47A8-B9C0-D1E2F3A4B5C6</string></array>
+			</dict>
+			<key>PayloadIdentifier</key><string>com.example.firstactiveethernet.managed</string>
+			<key>PayloadType</key><string>com.apple.firstactiveethernet.managed</string>
+			<key>PayloadUUID</key><string>C3D4E5F6-A7B8-49C0-D1E2-F3A4B5C6D7E8</string>
+			<key>PayloadVersion</key><integer>1</integer>
+		</dict>
+	</array>
+	<key>PayloadDisplayName</key><string>802.1X Profile</string>
+	<key>PayloadIdentifier</key><string>com.example.8021x.universal</string>
+	<key>PayloadType</key><string>Configuration</string>
+	<key>PayloadUUID</key><string>D4E5F6A7-B8C9-4AD0-E1F2-A3B4C5D6E7F8</string>
+	<key>PayloadVersion</key><integer>1</integer>
+</dict>
+</plist>

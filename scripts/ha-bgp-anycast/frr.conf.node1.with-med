@@ -1,0 +1,26 @@
+! Node 1 (192.168.200.21) – BGP anycast with MED so router (e.g. pfSense) prefers this node.
+! Use this if local-preference on the router doesn't work. Replace 192.168.200.1 and 65000.
+frr version 10.3
+frr defaults traditional
+hostname freeradius-node-a
+log syslog informational
+no ip forwarding
+no ipv6 forwarding
+service integrated-vtysh-config
+!
+router bgp 65004
+ bgp router-id 192.168.200.21
+ no bgp ebgp-requires-policy
+ neighbor 192.168.200.1 remote-as 65000
+ neighbor 192.168.200.1 route-map SET_MED_OUT out
+ !
+ address-family ipv4 unicast
+  network 192.168.200.100/32
+ exit-address-family
+exit
+!
+route-map SET_MED_OUT permit 10
+ set metric 50
+!
+line vty
+!

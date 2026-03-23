@@ -1,0 +1,10 @@
+# -*- text -*-
+##
+## mschap.conf -- NTLM disabled in AD; MS-CHAPv2/ntlm_auth not used.
+## Inner auth is PAP + LDAP bind (see eap: default_eap_type = pap).
+## Leave ntlm_auth commented; if a client sends MS-CHAP it will not be verified.
+##
+mschap {
+	# NTLM disabled in domain; do not use ntlm_auth.
+	# ntlm_auth = "/usr/bin/ntlm_auth ..."
+}

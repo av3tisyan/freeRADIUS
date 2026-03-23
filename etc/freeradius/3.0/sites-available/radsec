@@ -1,0 +1,77 @@
+# -*- text -*-
+##
+## RadSec (RADIUS over TLS) - TCP port 2083
+## Requests are forwarded to the default virtual server (same auth as UDP 1812).
+## Reuses EAP server cert; clients identified by IP. Set require_client_cert = yes
+## and issue client certs for mutual TLS if your NAS support it.
+##
+######################################################################
+
+listen {
+	ipaddr = *
+	port = 2083
+	type = auth+acct
+	proto = tcp
+	virtual_server = default
+	clients = radsec
+
+	limit {
+		max_connections = 32
+		lifetime = 0
+		idle_timeout = 60
+	}
+
+	# Reuse same certs as EAP (server.key, server.pem, ca.pem)
+	# Uses ${confdir}/certs so it works when certdir/cadir are not set in radiusd.conf
+	tls {
+		private_key_password = REPLACE_TLS_KEY_PASSWORD_OR_EMPTY
+		private_key_file = ${confdir}/certs/server.key
+		certificate_file = ${confdir}/certs/server.pem
+		ca_file = ${confdir}/certs/ca.pem
+		ca_path = ${confdir}/certs
+
+		# Optional: require client certs for mutual TLS (set yes if NAS have certs)
+		require_client_cert = no
+
+		cipher_list = "EECDH+AESGCM:EECDH+CHACHA20:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"
+		cipher_server_preference = yes
+		tls_min_version = "1.2"
+		tls_max_version = "1.3"
+		ecdh_curve = "X25519:prime256v1:secp384r1"
+
+		cache {
+			enable = no
+		}
+	}
+}
+
+# RadSec clients: same IPs as clients.conf (VPN gateway, Wi‑Fi NAS, wired NAS).
+# Add localhost for local testing (e.g. openssl s_client -connect localhost:2083).
+clients radsec {
+	client localhost {
+		ipaddr = 127.0.0.1
+		proto = tls
+		secret = REPLACE_RADSEC_SECRET
+		shortname = localhost-radsec
+	}
+	client vpn-gateway {
+		ipaddr = 192.168.203.2
+		proto = tls
+		secret = REPLACE_RADSEC_SECRET
+		shortname = vpn-gateway-radsec
+	}
+	client wifi-nas {
+		ipaddr = 192.168.201.0
+		netmask = 25
+		proto = tls
+		secret = REPLACE_WIFI_NAS_RADSEC_SECRET
+		shortname = wifi-nas-radsec
+	}
+	# Wired NAS (if using RadSec; otherwise use UDP clients.conf)
+	client wired-nas-01 {
+		ipaddr = 192.168.202.20
+		proto = tls
+		secret = REPLACE_WIRED_NAS_RADSEC_SECRET
+		shortname = wired-nas-01
+	}
+}
